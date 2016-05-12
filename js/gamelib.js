@@ -36,6 +36,11 @@ GameLib.prototype.elapsedTime = function() {
     return Date.now() - this.start;
 }
 
+GameLib.prototype.elapsedTimeInSeconds = function() {
+  var $this = this;
+  return (Date.now() - this.start) / 1000;
+}
+
 GameLib.prototype.setBackground = function(backgroundLocation) {
     var $this = this;
 
@@ -108,7 +113,8 @@ GameLib.prototype.gameLoop = function() {
     var now = Date.now();
     var delta = now - this.then;
     // console.log("this.then:", this.then);
-    this.updateFunc(delta / 1000);
+    this.modifier = delta / 1000;
+    this.updateFunc(this.modifier);
     this.render();
 
     this.then = now;
@@ -119,6 +125,7 @@ GameLib.prototype.gameLoop = function() {
 
 GameLib.prototype.registerSprite = function(name, sprite) {
     this.sprites[name] = sprite;
+    sprite.gamelib = this;
 }
 
 GameLib.prototype.getSprite = function(name) {
@@ -129,9 +136,18 @@ GameLib.prototype.randomBetween = function(begin, end) {
     return Math.floor(Math.random() * end) + begin;
 }
 
-
 function Sprite(imageSrc) {
     var $this = this;
+
+    this.DIRECTION = {
+      NOT: 0,
+      LEFT: 1,
+      RIGHT: 2,
+      UP: 3,
+      DOWN: 4
+    };
+
+    this.direction = this.DIRECTION.RIGHT;
 
     this.ready = false;
     this.image = new Image();
@@ -141,21 +157,72 @@ function Sprite(imageSrc) {
     this.image.src = imageSrc;
 }
 
-Sprite.prototype.moveCenter = function(canvas) {
-    this.x = canvas.width / 2;
-    this.y = canvas.height / 2;
+Sprite.prototype.move = function() {
+  switch(this.direction) {
+    case this.DIRECTION.LEFT:
+      console.log("left");
+      return this.moveLeft();
+    case this.DIRECTION.RIGHT:
+      console.log("right");
+      return this.moveRight();
+    case this.DIRECTION.UP:
+      console.log("up");
+      return this.moveUp();
+    case this.DIRECTION.DOWN:
+      console.log("down");
+      return this.moveDown();
+  }
+}
+Sprite.prototype.moveLeft = function() {
+  worked = false;
+  if(this.x > this.image.width) {
+      this.x -= this.speed * this.gamelib.modifier;
+      worked = true;
+      this.direction = this.DIRECTION.LEFT;
+  }
+
+  return worked;
 }
 
-Sprite.prototype.moveRandom = function(canvas) {
-  this.x = 32 + (Math.random() * (canvas.width - 64));
-	this.y = 32 + (Math.random() * (canvas.height - 64));
+Sprite.prototype.moveRight = function() {
+  worked = false;
+  if(this.x < (this.gamelib.canvas.width - this.image.width)) {
+      this.x += this.speed * this.gamelib.modifier;
+      worked = true;
+      this.direction = this.DIRECTION.RIGHT;
+  }
+
+  return worked;
 }
 
-// Sprite.prototype.moveX = function(xfactor) {
-//   directional = xfactor > 0 ? 1 : 0;
-//   if (this.x < canvas.width && this.x > 0) {
-//     this.x += xfactor;
-//   } else if (this.x > 5 && this.x < 0) {
-//     this.x
-//   }
-// }
+Sprite.prototype.moveUp = function() {
+  worked = false;
+  if(this.y > this.image.height) {
+    this.y -= this.speed * this.gamelib.modifier;
+    worked = true;
+    this.direction = this.DIRECTION.UP;
+  }
+
+  return worked;
+}
+
+Sprite.prototype.moveDown = function() {
+  worked = false;
+  if(this.y < (this.gamelib.canvas.height - this.image.height)) {
+    this.y += this.speed * this.gamelib.modifier;
+    worked = true;
+    this.direction = this.DIRECTION.DOWN;
+  }
+
+  return worked;
+}
+
+Sprite.prototype.moveCenter = function() {
+    this.x = this.gamelib.canvas.width / 2;
+    this.y = this.gamelib.canvas.height / 2;
+}
+
+Sprite.prototype.moveRandom = function() {
+  this.x = 32 + (Math.random() * (this.gamelib.canvas.width - 64));
+	this.y = 32 + (Math.random() * (this.gamelib.canvas.height - 64));
+}
