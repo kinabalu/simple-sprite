@@ -160,16 +160,12 @@ function Sprite(imageSrc) {
 Sprite.prototype.move = function() {
   switch(this.direction) {
     case this.DIRECTION.LEFT:
-      console.log("left");
       return this.moveLeft();
     case this.DIRECTION.RIGHT:
-      console.log("right");
       return this.moveRight();
     case this.DIRECTION.UP:
-      console.log("up");
       return this.moveUp();
     case this.DIRECTION.DOWN:
-      console.log("down");
       return this.moveDown();
   }
 }
