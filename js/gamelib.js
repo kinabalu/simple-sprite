@@ -10,24 +10,22 @@ function GameLib(width, height) {
     var w = window;
     this.requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
 
-    this.keysDown = {};
-
-    addEventListener("keydown", function(e) {
-        $this.keysDown[e.keyCode] = true;
-    }, false);
-
-    addEventListener("keyup", function(e) {
-        delete $this.keysDown[e.keyCode];
-    }, false);
-
     this.then = Date.now();
     this.start = Date.now();
     this.sprites = {};
+    this.sounds = {};
 }
 
 // Cross-browser support for requestAnimationFrame
 GameLib.prototype.requestAnimationFrame = function(func) {
     this.requestAnimationFrame(func);
+}
+
+GameLib.prototype.drawTextCenter = function(text) {
+  var measured_text = this.ctx.measureText(text);
+  text_x = (this.canvas.width - measured_text.width) / 2;
+  text_y = this.canvas.height / 2;
+  this.drawText(text, text_x, text_y);
 }
 
 GameLib.prototype.elapsedTime = function() {
@@ -85,10 +83,6 @@ GameLib.prototype.init = function(updateFunc, renderFunc) {
     this.renderFunc = renderFunc;
 }
 
-GameLib.prototype.processKeystroke = function(actions) {
-
-}
-
 GameLib.prototype.spritesCollide = function(first, second) {
 	if (first.x <= (second.x + 32) && second.x <= (first.x + 32) && first.y <= (second.y + 32) && second.y <= (first.y + 32)) {
 	    return true;
@@ -116,12 +110,20 @@ GameLib.prototype.registerSprite = function(name, sprite) {
     sprite.gamelib = this;
 }
 
+GameLib.prototype.registerSound = function(name, audio) {
+  this.sounds[name] = audio;
+}
+
 GameLib.prototype.deregisterSprite = function(name) {
   delete this.sprites[name];
 }
 
 GameLib.prototype.getSprite = function(name) {
     return this.sprites[name];
+}
+
+GameLib.prototype.getSound = function(name) {
+  return this.sounds[name];
 }
 
 GameLib.prototype.randomBetween = function(begin, end) {
