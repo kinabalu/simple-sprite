@@ -86,18 +86,6 @@ GameLib.prototype.init = function(updateFunc, renderFunc) {
 }
 
 GameLib.prototype.processKeystroke = function(actions) {
-	if (38 in gamelib.keysDown) { // Player holding up
-	    actions.up();
-	}
-	if (40 in gamelib.keysDown) { // Player holding down
-	    actions.down();
-	}
-	if (37 in gamelib.keysDown) { // Player holding left
-	    actions.left();
-	}
-	if (39 in gamelib.keysDown) { // Player holding right
-	    actions.right();
-	}
 
 }
 
@@ -126,6 +114,10 @@ GameLib.prototype.gameLoop = function() {
 GameLib.prototype.registerSprite = function(name, sprite) {
     this.sprites[name] = sprite;
     sprite.gamelib = this;
+}
+
+GameLib.prototype.deregisterSprite = function(name) {
+  delete this.sprites[name];
 }
 
 GameLib.prototype.getSprite = function(name) {
@@ -221,4 +213,43 @@ Sprite.prototype.moveCenter = function() {
 Sprite.prototype.moveRandom = function() {
   this.x = 32 + (Math.random() * (this.gamelib.canvas.width - 64));
 	this.y = 32 + (Math.random() * (this.gamelib.canvas.height - 64));
+}
+
+
+function KeyListener() {
+  this.pressedKeys = [];
+
+  this.keydown = function(e) {
+    this.pressedKeys[e.keyCode] = true;
+  };
+
+  this.keyup = function(e) {
+    this.pressedKeys[e.keyCode] = false;
+  }
+
+  document.addEventListener("keydown", this.keydown.bind(this));
+  document.addEventListener("keyup", this.keyup.bind(this));
+}
+
+KeyListener.prototype.isPressed = function(key) {
+  return this.pressedKeys[key] ? true : false;
+}
+
+KeyListener.prototype.addKeyPressListener = function(keyCode, callback) {
+  document.addEventListener("keypress", function(e) {
+    if(e.keyCode == keyCode)
+      callback(e);
+  });
+};
+
+
+function Key() {
+  this.UP_ARROW = 38;
+  this.DOWN_ARROW = 40;
+  this.LEFT_ARROW = 37;
+  this.RIGHT_ARROW = 39;
+  this.W = 87;
+  this.A = 65;
+  this.D = 68;
+  this.S = 83;
 }
