@@ -16,6 +16,10 @@ function GameLib(width, height) {
     this.sounds = {};
 }
 
+function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 // Cross-browser support for requestAnimationFrame
 GameLib.prototype.requestAnimationFrame = function(func) {
     this.requestAnimationFrame(func);
@@ -221,6 +225,12 @@ Sprite.prototype.moveRandom = function() {
 function KeyListener() {
   this.pressedKeys = [];
 
+  this.UP_ARROW = 38;
+  this.DOWN_ARROW = 40;
+  this.LEFT_ARROW = 37;
+  this.RIGHT_ARROW = 39;
+  this.SPACE_BAR = 32;
+
   this.keydown = function(e) {
     this.pressedKeys[e.keyCode] = true;
   };
@@ -234,7 +244,11 @@ function KeyListener() {
 }
 
 KeyListener.prototype.isPressed = function(key) {
-  return this.pressedKeys[key] ? true : false;
+  var keyCode = key;
+  if(!isNumeric(key)) {
+    keyCode = key.charCodeAt()
+  }
+  return this.pressedKeys[keyCode] ? true : false;
 }
 
 KeyListener.prototype.addKeyPressListener = function(keyCode, callback) {
@@ -243,15 +257,3 @@ KeyListener.prototype.addKeyPressListener = function(keyCode, callback) {
       callback(e);
   });
 };
-
-
-function Key() {
-  this.UP_ARROW = 38;
-  this.DOWN_ARROW = 40;
-  this.LEFT_ARROW = 37;
-  this.RIGHT_ARROW = 39;
-  this.W = 87;
-  this.A = 65;
-  this.D = 68;
-  this.S = 83;
-}
