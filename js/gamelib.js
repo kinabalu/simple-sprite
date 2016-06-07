@@ -114,6 +114,23 @@ GameLib.prototype.registerSprite = function(name, sprite) {
     sprite.gamelib = this;
 }
 
+GameLib.prototype.registerSpriteGroup = function(name, total, sprite_image_location) {
+  for(var i=0; i<total; i++) {
+  	gamelib.registerSprite(name + "." + i, new Sprite(sprite_image_location));
+  }
+}
+
+GameLib.prototype.getSpriteGroup = function(name, cb) {
+  var $this = this;
+  console.log(this.sprites);
+  Object.keys(this.sprites).forEach(function (key) {
+     if(key.indexOf(name) == 0) {
+       console.log(key);
+       cb($this.sprites[key], key);
+     }
+  });
+}
+
 GameLib.prototype.registerSound = function(name, audio) {
   this.sounds[name] = audio;
 }
